@@ -10,8 +10,9 @@ const checkUserAuth = async(req, res, next) => {
             return res.status(500).json({ message: "Unauthorized User", error: error.message})
         }
         const token = authorization.split(' ')[1]
-        const { id } = jwt.sign(token, process.env.JWT_SECRET)
-        const user = await userModel.find({ id }) 
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        const { id } = decoded
+        const user = await userModel.findOne({ _id: id }) 
         
         if(!user){
             return res.status(500).json({message: "User not found", error: error.message})

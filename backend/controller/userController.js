@@ -2,6 +2,7 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const userModel = require("../models/userModel");
+const { transporter } = require('../middleware/email');
 const register = async(req, res ) =>{
  const {firstName, lastName, email, password} = req.body;
  try {
@@ -72,7 +73,40 @@ const changePassword =async (req, res ) =>{
         return res.status(401).json({message: "An error while updating your password", error: error.message})
     }
 }
-const resetPassword =async (req, res ) =>{}
-const changePasswordEmail = (req, res ) =>{}
+const sendEmail =async (req, res ) =>{
+    const { email } = req.body;
 
-module.exports ={ register, login, changePassword}
+    try {
+        if(!email){
+            return res.status(401).json({message: "Email doesn't exists"})
+        }
+        const user = await userModel.findOne({ email })
+        if(!user){
+            return res.status(401).json({message: "No user exist with this email"})
+        }
+        const secret = user._id + process.env.JWT_SECRET
+        const token = jwt.sign({ id: user._id}, secret, {expiresIn: '30min'})
+        const resetLink = `http://127.0.0.1:5000/api/sendresetemail/${user._id}/${token}`
+        const message = `We have  received a password reset request. Please use the link below to reset your password. \n\n${resetLink}/\n\n. This link is valid for 30 minutes.`
+
+
+        let mailOptions = {
+            from: process.env.EMAIL_FROM,
+            to: user.email,
+            subject: "Reset password request received",
+            text: message
+        }
+        await transporter.sendMail(mailOptions)
+      
+        return res.status(201).json({ message: "Reset email sent to your gmail account"})
+
+
+
+    } catch (error) {
+        return res.status(500).json({message: "An error occur while sending email", error: error.message})
+    }
+
+}
+const changePasswordEmail = async(req, res ) =>{}
+
+module.exports ={ register, login, changePassword, sendEmail}
