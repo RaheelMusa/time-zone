@@ -7,7 +7,7 @@ const register = async(req, res ) =>{
  const {firstName, lastName, email, password} = req.body;
  try {
     if(!firstName || !lastName  || !email || !password  ){
-        return res.status(500).json({message: "all field are required", error: error.message})
+        return res.status(500).json({message: "all field are required"})
     }
     const existingUser = await userModel.findOne({ email })
     if(existingUser){
@@ -34,7 +34,7 @@ const login = async(req, res ) => {
     const {email, password} = req.body;
     try {
         if(!email || !password) {
-            return res.status(400).json({message: "Email or password required"})
+            return res.status(401).json({message: "Email or password required"})
         }       
         const existingUser = await userModel.findOne({ email })
         if(!existingUser){
@@ -70,7 +70,7 @@ const changePassword =async (req, res ) =>{
         await userModel.findByIdAndUpdate(user._id, {$set: {password: newHashedPassword}})
         return res.status(201).json({message: `Your password pass been updated successfully`})
     } catch (error) {
-        return res.status(401).json({message: "An error while updating your password", error: error.message})
+        return res.status(500).json({message: "An error while updating your password", error: error.message})
     }
 }
 const sendEmail =async (req, res ) =>{
@@ -78,17 +78,17 @@ const sendEmail =async (req, res ) =>{
 
     try {
         if(!email){
-            return res.status(401).json({message: "Email doesn't exists"})
+            return res.status(400).json({message: "Email doesn't exists"})
         }
         const user = await userModel.findOne({ email })
         if(!user){
-            return res.status(401).json({message: "No user exist with this email"})
+            return res.status(400).json({message: "No user exist with this email"})
         }
         const secret = user._id + process.env.JWT_SECRET
         const token = jwt.sign({ id: user._id}, secret, {expiresIn: '30min'})
-        const resetLink = `http://127.0.0.1:5000/api/sendresetemail/${user._id}/${token}`
-        const message = `We have  received a password reset request. Please use the link below to reset your password. \n\n${resetLink}/\n\n. This link is valid for 30 minutes.`
-
+        const resetLink = `${process.env.BASE_URL}/api/resetpassword/${user._id}/${token}`
+        const message = `We have  received a password reset request. Please use the link below to reset your password. \n\n${resetLink}\n\n. This link is valid for 30 minutes.`
+        console.log(resetLink)
 
         let mailOptions = {
             from: process.env.EMAIL_FROM,
@@ -107,6 +107,35 @@ const sendEmail =async (req, res ) =>{
     }
 
 }
-const changePasswordEmail = async(req, res ) =>{}
 
-module.exports ={ register, login, changePassword, sendEmail}
+const resetPassword = async(req, res ) =>{
+    const {password, confirmPassword} = req.body;
+    const { id, token } = req.params
+    const user = await userModel.findById(id)
+    const new_secret = user._id + process.env.JWT_SECRET
+
+    try {
+        if(!password || !confirmPassword){
+            return res.status(400).json({message: "Both field are required"})
+        }
+        if(password !== confirmPassword){
+                return res.status(500).json({message:" Password didn't matched"})
+        }   
+
+        try {
+                 const verifyToken = jwt.verify(token, new_secret)
+                
+             } catch (jwtError) {
+                return res.status(400).json({message: "Inavalid token", error: jwtError.message})
+             }
+             const newHashedPassword = await bcrypt.hash(password, 10)
+             await userModel.findByIdAndUpdate(user._id, {$set: {password: newHashedPassword}})
+             return res.status(201).json({message: "Your password has been reset succesfully"})
+        
+    } catch (error) {
+        
+        return res.status(400).json({message: "An error occur while resetting your password"})
+    }
+}
+
+module.exports ={ register, login, changePassword, sendEmail, resetPassword}

@@ -4,7 +4,7 @@
         title: {
             type:String
         },
-        desc: {
+        descripton: {
             type: String
         },
         price: {
@@ -13,7 +13,9 @@
         review: {
             type: String
         },
-        image: { type: String }
+        image: { type: String },
+        rating: {type: String},
+        color: {type: String}
  })
  const productModel = new mongoose.model("Products", productSchema)
 
