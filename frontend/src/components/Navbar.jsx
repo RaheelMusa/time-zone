@@ -14,9 +14,9 @@ const Navbar = () => {
   return (
     <div className="text-base">
       <div className="flex justify-between items-center px-6 py-6 font-semibold">
-        <h1 className="md:text-3xl text-xl font-bold">
+        <Link href="/" className="md:text-3xl text-xl font-bold">
           Time <span className="text-red-500">Zone</span>
-        </h1>
+        </Link>
         <div className="hidden md:block">
           <ul className="flex gap-5 items-center justify-center ">
             {links.map((link) => {
