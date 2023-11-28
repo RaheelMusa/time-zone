@@ -85,15 +85,9 @@ const sendEmail =async (req, res ) =>{
             return res.status(400).json({message: "No user exist with this email"})
         }
         const secret = user._id + process.env.JWT_SECRET
-<<<<<<< HEAD
-        const token = jwt.sign({ id: user._id}, secret, {expiresIn: '1min'})
-        const resetLink = `http://127.0.0.1:5000/api/resetpassword/${user._id}/${token}`
-        const message = `We have  received a password reset request. Please use the link below to reset your password. \n\n${resetLink}/\n\n. This link is valid for 30 minutes.`
-=======
         const token = jwt.sign({ id: user._id}, secret, {expiresIn: '30min'})
         const resetLink = `${process.env.BASE_URL}/api/resetpassword/${user._id}/${token}`
         const message = `We have  received a password reset request. Please use the link below to reset your password. \n\n${resetLink}\n\n. This link is valid for 30 minutes.`
->>>>>>> b45367f2e1ecb278b7034a2f862bb6b4852db631
         console.log(resetLink)
 
         let mailOptions = {
@@ -114,48 +108,6 @@ const sendEmail =async (req, res ) =>{
 
 }
 
-<<<<<<< HEAD
-const resetEmailPassword = async(req, res) =>{
-    const { password, confirmPassword} = req.body
-    const {id, token } = req.params
-    try {
-        if( !password || !confirmPassword){
-            return res.status(500).json({message: "All field are required"})
-        }
-        if( password !== confirmPassword){
-            return res.status(500).json({message: "Password didn't matched"})
-
-        }
-        const user = await userModel.findById(id)
-        if(!user) {
-            return res.status(404).json({message: "User not found"})
-        }
-        const new_secret =  user._id + process.env.JWT_SECRET
-        try {
-            const verifytoken = jwt.verify(token, new_secret)
-            if(!verifytoken){
-                return res.status(500).json({error: error.message, message: "there is an error with your verifyed token"})
-            }
-            if(verifytoken.exp < Date.now() / 1000){
-                return res.status(401).json({message: "tokeen has expired   "})
-            }
-        } catch (error) {
-            return res.status(401).json({message: "Inavid or expired token", error: error.message})
-        }
-       
-     
-        const newHashedPassword = await bcrypt.hash(password, 10)
-        await userModel.findByIdAndUpdate(user._id,
-             {$set: { password: newHashedPassword}})
-        return res.status(201).json({message: "Your password has been reset successfully"})
-
-
-    } catch (error) {
-        return res.status(500).json({message: "An error while reseting your password", error: error.message})
-    }
-}
-module.exports ={ register, login, changePassword, sendEmail, resetEmailPassword}
-=======
 const resetPassword = async(req, res ) =>{
     const {password, confirmPassword} = req.body;
     const { id, token } = req.params
@@ -187,4 +139,3 @@ const resetPassword = async(req, res ) =>{
 }
 
 module.exports ={ register, login, changePassword, sendEmail, resetPassword}
->>>>>>> b45367f2e1ecb278b7034a2f862bb6b4852db631
