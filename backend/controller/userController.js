@@ -25,6 +25,7 @@ const register = async(req, res ) =>{
     const token = jwt.sign({
         email: user.email, id: user._id
     }, process.env.JWT_SECRET)
+
     res.status(200).json({message: "Successfully registered your account", user: user, token})
  } catch (error) {
     res.status(500).json({ message: "An error occur while registering your account"})
@@ -96,7 +97,13 @@ const sendEmail =async (req, res ) =>{
             subject: "Reset password request received",
             text: message
         }
-        await transporter.sendMail(mailOptions)
+        await transporter.sendMail(mailOptions, (err, data)=>{
+            if(err){
+                console.log("error occur", err)
+            }else{
+                console.log("Email sent to ", user.email)
+            }
+        })
       
         return res.status(201).json({ message: "Reset email sent to your gmail account"})
 
