@@ -4,13 +4,13 @@ import React from "react";
 const Footer = () => {
   return (
     <div>
-      <div className="md:w-[80vw] min-h-48 my-10  flex-col items-center flex mx-auto">
-        <div className="grid grid-cols-1 my-10 md:grid-cols-2 md:justify-between md:gap-20 text-center md:text-start lg:grid-cols-4">
-          <div className="my-3">
+      <div className="md:w-[80vw] min-h-48 my-10 text-center flex-col items-center flex mx-auto">
+        <div className="grid grid-cols-1 my-10 md:grid-cols-2 md:justify-between md:gap-20 text-center  lg:grid-cols-4">
+          <div className="my-3 md:flex flex-col items-center justify-center">
             <Link href="/" className="md:text-3xl text-xl font-bold px-3">
               Time <span className="text-red-500">Zone</span>
             </Link>
-            <p>
+            <p className="w-1/2 md:w-full mx-auto">
               Asorem ipsum adipolor sdit amet, consectetur adipisicing elitcf
               sed do eiusmod tem.
             </p>
