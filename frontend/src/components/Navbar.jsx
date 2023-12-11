@@ -5,10 +5,58 @@ import { AiOutlineShoppingCart } from "react-icons/ai";
 import Link from "next/link";
 
 const links = [
-  { id: 1, title: "Home", url: "" },
-  { id: 2, title: "Contact", url: "" },
-  { id: 3, title: "Blog", url: "" },
-  { id: 4, title: "Pages", url: "" },
+  { id: 1, title: "Home", url: "/" },
+  { id: 2, title: "Contact", url: "/contact" },
+  { id: 3, title: "Shop", url: "/shop" },
+  {
+    id: 4,
+    title: "Blog",
+    url: "/blog",
+    sublinks: [
+      {
+        id: 42,
+        title: "Blog",
+        url: "",
+      }, {
+        id: 43,
+        title: "Blog Detail",
+        url: "",
+      },
+    ],
+  },
+  {
+    id: 5,
+    title: "Pages",
+    url: "",
+    sublinks: [
+      {
+        id: 51,
+        title: "Login",
+        url: "/login",
+      },{
+        id: 52,
+        title: "Cart",
+        url: "/cart",
+      },{
+        id: 53,
+        title: "Element",
+        url: "/element",
+      },
+      {
+        id: 54,
+        title: "Confirmation",
+        url: "",
+      },
+      {
+        id: 55,
+        title: "Product",
+        url: "",
+      },
+      {
+        id:56, title: "checkout", url: ""
+      },
+    ],
+  },
 ];
 const Navbar = () => {
   return (
@@ -23,10 +71,38 @@ const Navbar = () => {
               return (
                 <li
                   key={link.id}
-                  url={link.url}
-                  className="hover:text-red-500 cursor-pointer hover:duration-100"
+                  className="hover:text-red-500 cursor-pointer relative group py-2 hover:duration-100 duration-700 transition-all "
                 >
-                  {link.title}
+                  {link.sublinks ? (
+                    <ul>
+                      <li>
+                        {" "}
+                        <Link href={link.url}>{link.title}</Link>
+                      </li>
+                    </ul>
+                  ) : (
+                    <ul>
+                      <li>
+                        <Link href={link.url}>{link.title}</Link>
+                      </li>
+                    </ul>
+                  )}
+                  {link.sublinks && (
+                    <ul className="hidden absolute z-10 left-0 bg-white px-6 border-t-2 border-red-500 py-4 space-y-2 group-hover:block mt-2 text-black rounded-md">
+                      {link.sublinks.map((sublinkItem) => {
+                        return (
+                          <li key={sublinkItem.id} className=" hover:text-red-500">
+                            <Link
+                              href={sublinkItem.url}
+                              className="hover:text-red-400"
+                            >
+                              {sublinkItem.title}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </li>
               );
             })}
